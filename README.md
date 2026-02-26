@@ -71,7 +71,7 @@ OceanViewResort/
 ## Setup Instructions
 
 ### Prerequisites
-- Java JDK 11
+- Java JDK 17
 - Apache Tomcat 9
 - MySQL 8.0
 - Maven
