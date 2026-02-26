@@ -42,6 +42,8 @@ A web-based hotel room reservation system developed for Ocean View Resort, Galle
 - Exit System
 
 ## Project Structure
+
+```
 OceanViewResort/
 ├── .github/workflows/ci.yml
 ├── src/
@@ -58,6 +60,7 @@ OceanViewResort/
 │ └── test/java/com/oceanview/
 ├── pom.xml
 └── database_setup.sql
+```
 
 ## Database Features
 
