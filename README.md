@@ -15,7 +15,7 @@ A web-based hotel room reservation system developed for Ocean View Resort, Galle
 
 | Layer | Technology |
 |-------|------------|
-| **Language** | Java 11 |
+| **Language** | Java 17 |
 | **Server** | Apache Tomcat 9 |
 | **Database** | MySQL 8.0 |
 | **Build Tool** | Maven |
