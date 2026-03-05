@@ -82,12 +82,13 @@ public class AuthenticationFilter implements Filter {
             || path.startsWith("/api/");
 }
 
-    /**
+/**
      * Check if the requested page is admin-only
      */
     private boolean isAdminOnly(String path) {
         return path.equals("/reports")
-                || path.equals("/register");
+                || path.equals("/register")
+                || path.equals("/staff");
     }
 
     @Override

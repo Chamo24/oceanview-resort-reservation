@@ -1,10 +1,13 @@
 package com.oceanview.dao;
 
 import com.oceanview.model.User;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * UserDAO - Data Access Object for User operations
@@ -16,6 +19,38 @@ public class UserDAO {
 
     public UserDAO() {
         this.dbConnection = DBConnection.getInstance();
+    }
+
+    /**
+     * Get all users (staff list) - for Admin read-only staff management page
+     */
+    public List<User> getAllUsers() {
+        String sql = "SELECT user_id, username, full_name, role, created_at, is_first_login " +
+                     "FROM users ORDER BY created_at DESC";
+
+        List<User> users = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                User u = new User();
+                u.setUserId(rs.getInt("user_id"));
+                u.setUsername(rs.getString("username"));
+                u.setFullName(rs.getString("full_name"));
+                u.setRole(rs.getString("role"));
+                u.setCreatedAt(rs.getTimestamp("created_at"));
+                u.setFirstLogin(rs.getInt("is_first_login") == 1);
+
+                users.add(u);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error getting all users: " + e.getMessage());
+        }
+
+        return users;
     }
 
     /**
@@ -79,6 +114,7 @@ public class UserDAO {
 
         return user;
     }
+
     /**
      * Register a new user
      */
@@ -123,5 +159,5 @@ public class UserDAO {
         }
 
         return false;
-    } 
+    }
 }

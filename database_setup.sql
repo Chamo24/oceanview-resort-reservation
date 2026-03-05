@@ -66,9 +66,13 @@ CREATE TABLE bills (
     rate_per_night DECIMAL(10,2) NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL,
     bill_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    payment_status VARCHAR(10) NOT NULL DEFAULT 'UNPAID',
+    payment_method VARCHAR(10) DEFAULT NULL,
+    paid_at TIMESTAMP NULL,
+
     generated_by INT,
-    FOREIGN KEY (reservation_id) 
-        REFERENCES reservations(reservation_id),
+    FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id),
     FOREIGN KEY (generated_by) REFERENCES users(user_id)
 );
 

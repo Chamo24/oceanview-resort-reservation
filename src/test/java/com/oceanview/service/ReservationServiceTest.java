@@ -178,4 +178,14 @@ public class ReservationServiceTest {
         verify(mockReservationDAO, never())
             .getReservationByNumber(anyString());
     }
+    
+    @Test
+    public void testMarkBillAsPaid_Success() {
+        when(mockBillDAO.markBillAsPaid(1, "CASH")).thenReturn(true);
+
+        String result = reservationService.markBillAsPaid(1, "CASH");
+
+        assertNull(result);
+        verify(mockBillDAO, times(1)).markBillAsPaid(1, "CASH");
+    }
 }

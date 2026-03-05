@@ -4,6 +4,8 @@ import com.oceanview.dao.DAOFactory;
 import com.oceanview.dao.UserDAO;
 import com.oceanview.model.User;
 
+import java.util.List;
+
 /**
  * UserService - Business logic for User operations
  * Validates input before passing to DAO layer
@@ -64,5 +66,10 @@ public class UserService {
         }
 
         return null;
+    }
+
+    // ✅ Staff Management (Read-only) support
+    public List<User> getAllUsers() {
+        return userDAO.getAllUsers();
     }
 }

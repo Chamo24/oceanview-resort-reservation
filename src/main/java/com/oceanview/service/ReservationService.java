@@ -9,22 +9,17 @@ import com.oceanview.model.Reservation;
 import com.oceanview.model.Room;
 import java.util.List;
 
-/**
- * ReservationService - Business logic for Reservation and Bill operations
- * Handles validation, reservation creation, and bill generation
- * Part of the 3-Tier Architecture (Business Logic Layer)
- */
 public class ReservationService {
 
-	protected ReservationDAO reservationDAO;
-	protected RoomDAO roomDAO;
-	protected BillDAO billDAO;
-	protected ValidationService validationService;
+    protected ReservationDAO reservationDAO;
+    protected RoomDAO roomDAO;
+    protected BillDAO billDAO;
+    protected ValidationService validationService;
 
     public ReservationService() {
-    	this.reservationDAO = DAOFactory.createReservationDAO();
-        this.roomDAO = DAOFactory.createRoomDAO();
-        this.billDAO = DAOFactory.createBillDAO();
+        this.reservationDAO = DAOFactory.createReservationDAO();
+        this.roomDAO        = DAOFactory.createRoomDAO();
+        this.billDAO        = DAOFactory.createBillDAO();
         this.validationService = new ValidationService();
     }
 
@@ -33,8 +28,9 @@ public class ReservationService {
      * Returns error message if validation fails, null if successful
      */
     public String createReservation(String guestName, String address, String contactNumber,
-                                 String guestEmail, String roomType, int roomId, String checkInDate,
-                                 String checkOutDate, int createdBy) {
+                                    String guestEmail, String roomType, int roomId,
+                                    String checkInDate, String checkOutDate, int createdBy) {
+
         // Validate guest name
         if (!validationService.isValidGuestName(guestName)) {
             return "Invalid guest name. Only letters and spaces allowed (2-100 characters).";
@@ -65,13 +61,18 @@ public class ReservationService {
             return "Invalid check-out date. Check-out must be after check-in date.";
         }
 
-        // Check room availability
+        // Check room exists
         Room room = roomDAO.getRoomById(roomId);
         if (room == null) {
             return "Selected room not found.";
         }
         if (!"Available".equals(room.getStatus())) {
             return "Selected room is not available. Please choose another room.";
+        }
+
+        // Step 6 — Backend overlap check (double booking prevent)
+        if (reservationDAO.hasOverlappingReservation(roomId, checkInDate, checkOutDate)) {
+            return "Room already booked for selected dates. Please choose different dates or another room.";
         }
 
         // Generate reservation number using Stored Procedure
@@ -86,13 +87,12 @@ public class ReservationService {
         reservation.setReservationNumber(reservationNumber);
         reservation.setGuestEmail(guestEmail);
 
-        // Save to database (Trigger will auto-calculate nights and cost)
+        // Save to database
         boolean success = reservationDAO.addReservation(reservation);
         if (!success) {
             return "Error saving reservation. Please try again.";
         }
 
-        // Return null means success
         return null;
     }
 
@@ -125,25 +125,21 @@ public class ReservationService {
 
     /**
      * Generate bill for a reservation using Stored Procedure
-     * Returns error message if failed, null if successful
      */
     public String generateBill(int reservationId, int generatedBy) {
         if (reservationId <= 0) {
             return "Invalid reservation ID.";
         }
 
-        // Check if reservation exists
         Reservation reservation = reservationDAO.getReservationById(reservationId);
         if (reservation == null) {
             return "Reservation not found.";
         }
 
-        // Check if bill already exists
         if (billDAO.billExists(reservationId)) {
             return "Bill already generated for this reservation.";
         }
 
-        // Generate bill using Stored Procedure
         double total = billDAO.calculateBill(reservationId, generatedBy);
         if (total <= 0) {
             return "Error generating bill. Please try again.";
@@ -168,7 +164,33 @@ public class ReservationService {
     public List<Bill> getAllBills() {
         return billDAO.getAllBills();
     }
+    /**
+     * Record bill payment (PAID/UNPAID + CASH/CARD)
+     * Returns error message if failed, null if successful
+     */
+    public String markBillAsPaid(int billId, String method) {
 
+        if (billId <= 0) {
+            return "Invalid bill ID.";
+        }
+
+        if (method == null || method.trim().isEmpty()) {
+            return "Please select a payment method.";
+        }
+
+        method = method.trim().toUpperCase();
+        if (!method.equals("CASH") && !method.equals("CARD")) {
+            return "Invalid payment method.";
+        }
+
+        boolean ok = billDAO.markBillAsPaid(billId, method);
+        if (!ok) {
+            return "Payment update failed or bill already paid.";
+        }
+
+        return null; // success
+    }
+    
     /**
      * Update reservation status
      */
@@ -181,8 +203,8 @@ public class ReservationService {
         }
         return reservationDAO.updateReservationStatus(reservationId, status);
     }
-    public List<Reservation> getReservationsByDateRange(
-            String startDate, String endDate) {
+
+    public List<Reservation> getReservationsByDateRange(String startDate, String endDate) {
         if (startDate == null || startDate.trim().isEmpty()) {
             return new java.util.ArrayList<>();
         }

@@ -47,17 +47,23 @@
 
 <div class="main-content">
 
-    <div class="page-header">
-        <h2>👤 Register New Staff Member</h2>
-        <p>Create login credentials for a new staff member</p>
-    </div>
+   <div class="page-header">
+    <h2>👤 Register New Staff Member</h2>
+    <p>Create login credentials for a new staff member</p>
+</div>
 
-    <c:if test="${not empty success}">
-        <div class="alert alert-success">${success}</div>
-    </c:if>
-    <c:if test="${not empty error}">
-        <div class="alert alert-error">${error}</div>
-    </c:if>
+<div style="margin-bottom: 15px;">
+    <a href="staff?action=list" class="btn btn-info" style="width:auto;">
+        👥 View Staff List
+    </a>
+</div>
+
+<c:if test="${not empty success}">
+    <div class="alert alert-success">${success}</div>
+</c:if>
+<c:if test="${not empty error}">
+    <div class="alert alert-error">${error}</div>
+</c:if>
 
 <div class="card" style="max-width: 700px; margin: 0 auto;">
     <div class="card-header">New Staff Account Details</div>

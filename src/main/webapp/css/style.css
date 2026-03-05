@@ -647,6 +647,21 @@ table tbody td {
     gap: 20px;
 }
 
+
+/* --- Dashboard Charts Grid --- */  
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+/* --- Print Styles --- */
+@media print {
+   
+}
+
+
 /* --- Print Styles --- */
 @media print {
     .navbar, .no-print {
@@ -682,6 +697,9 @@ table tbody td {
     .login-box {
         width: 90%;
         margin: 20px;
+     }
+    .charts-grid {                         
+        grid-template-columns: 1fr;
     }
 }
 

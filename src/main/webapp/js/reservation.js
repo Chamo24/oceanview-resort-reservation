@@ -5,8 +5,8 @@
  */
 
 function loadAvailableRooms() {
-    var roomType = document.getElementById('roomType').value;
-    var roomSelect = document.getElementById('roomId');
+    var roomType    = document.getElementById('roomType').value;
+    var roomSelect  = document.getElementById('roomId');
 
     roomSelect.innerHTML =
         '<option value="">-- Loading rooms... --</option>';
@@ -17,10 +17,23 @@ function loadAvailableRooms() {
         return;
     }
 
+    // Step 4 — checkIn/checkOut dates 
+    var checkInDate  = document.getElementById('checkInDate').value;
+    var checkOutDate = document.getElementById('checkOutDate').value;
+
+    // Base URL
+    var url = 'api/rooms?type=' + encodeURIComponent(roomType);
+
+    
+    if (checkInDate && checkOutDate &&
+            calculateNights(checkInDate, checkOutDate) > 0) {
+        url += '&checkIn='  + encodeURIComponent(checkInDate) +
+               '&checkOut=' + encodeURIComponent(checkOutDate);
+    }
+
     // AJAX call to REST API Web Service (RoomApiServlet)
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'api/rooms?type=' +
-        encodeURIComponent(roomType), true);
+    xhr.open('GET', url, true);
 
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
@@ -58,12 +71,12 @@ function loadAvailableRooms() {
 }
 
 function updateCostEstimate() {
-    var checkInDate = document.getElementById('checkInDate').value;
+    var checkInDate  = document.getElementById('checkInDate').value;
     var checkOutDate = document.getElementById('checkOutDate').value;
-    var roomSelect = document.getElementById('roomId');
+    var roomSelect   = document.getElementById('roomId');
     var costEstimate = document.getElementById('costEstimate');
     var nightsDisplay = document.getElementById('nightsDisplay');
-    var costDisplay = document.getElementById('costDisplay');
+    var costDisplay   = document.getElementById('costDisplay');
 
     if (!checkInDate || !checkOutDate || !roomSelect.value) {
         costEstimate.style.display = 'none';
@@ -87,7 +100,7 @@ function updateCostEstimate() {
     var totalCost = nights * rate;
 
     nightsDisplay.textContent = nights;
-    costDisplay.textContent = totalCost.toLocaleString('en-US', {
+    costDisplay.textContent   = totalCost.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });

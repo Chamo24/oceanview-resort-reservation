@@ -13,11 +13,13 @@
 <!-- Navigation Bar -->
 <nav class="navbar">
     <div class="navbar-content">
-        <div class="navbar-brand"><img src="images/logo.png" style="width:80px; height:auto; vertical-align:middle; margin-right:12px;">Ocean View <span>Resort</span></div>
+        <div class="navbar-brand">
+            <img src="images/logo.png"
+                 style="width:80px; height:auto; vertical-align:middle; margin-right:12px;">
+            Ocean View <span>Resort</span>
+        </div>
         <ul class="navbar-menu">
             <li><a href="dashboard">Home</a></li>
-
-            <!-- Reservations Dropdown -->
             <li>
                 <a href="#">Reservations <span class="dropdown-arrow">▼</span></a>
                 <ul class="dropdown-menu">
@@ -26,22 +28,17 @@
                     <li><a href="reservation?action=search">Search</a></li>
                 </ul>
             </li>
-
             <li><a href="bill?action=list">Bills</a></li>
-
-<c:if test="${sessionScope.role == 'admin'}">
-            <li><a href="reports">Reports</a></li>
-            <li>
-                <a href="#">Staff <span class="dropdown-arrow">▼</span></a>
-                <ul class="dropdown-menu">
-                    <li><a href="register">Register Staff</a></li>
-                </ul>
-            </li>
-</c:if>
-
+            <c:if test="${sessionScope.role == 'admin'}">
+                <li><a href="reports">Reports</a></li>
+                <li>
+                    <a href="#">Staff Management<span class="dropdown-arrow">▼</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="register">Register Staff</a></li>
+                    </ul>
+                </li>
+            </c:if>
             <li><a href="help.jsp">Help</a></li>
-
-            <!-- My Profile Dropdown -->
             <li>
                 <a href="#" style="color: #f39c12;">
                     👤 My Profile <span class="dropdown-arrow">▼</span>
@@ -60,35 +57,31 @@
 <!-- Main Content -->
 <div class="main-content">
 
-<!-- First Login Warning Banner -->
-<c:if test="${sessionScope.isFirstLogin == true}">
-    <div style="background: #e74c3c; color: white; 
-                padding: 15px 20px; text-align: center;
-                font-size: 15px; font-weight: 600;">
-        ⚠️ You are using a temporary password! 
-        Please 
-        <a href="changepassword" 
-           style="color: #f39c12; text-decoration: underline;">
-            Change Your Password
-        </a> 
-        immediately for security.
-    </div>
-</c:if>
+    <c:if test="${sessionScope.isFirstLogin == true}">
+        <div style="background: #e74c3c; color: white;
+                    padding: 15px 20px; text-align: center;
+                    font-size: 15px; font-weight: 600;">
+            ⚠️ You are using a temporary password! Please
+            <a href="changepassword" style="color: #f39c12; text-decoration: underline;">
+                Change Your Password
+            </a>
+            immediately for security.
+        </div>
+    </c:if>
 
-        <!-- Page Banner with Background Image -->
     <div class="page-banner">
         <h2>Welcome to Ocean View Resort</h2>
         <p>Room Reservation Management System - Galle, Sri Lanka</p>
     </div>
 
-        <!-- Room Availability Cards with Images -->
+    <!-- Room Cards -->
     <div class="room-cards">
         <div class="room-card">
-            <img src="images/single-room.jpg" alt="Single Room.jpg" class="room-card-img">
+            <img src="images/single-room.jpg" alt="Single Room" class="room-card-img">
             <div class="room-card-body">
                 <h3>Single Room</h3>
                 <div class="room-rate">LKR 5,000 - 5,500/night</div>
-                <div class="room-available">${singleCount}</div>
+                <div class="room-available" id="count-single">${singleCount}</div>
                 <div class="room-label">Available</div>
             </div>
         </div>
@@ -97,7 +90,7 @@
             <div class="room-card-body">
                 <h3>Double Room</h3>
                 <div class="room-rate">LKR 8,000 - 8,500/night</div>
-                <div class="room-available">${doubleCount}</div>
+                <div class="room-available" id="count-double">${doubleCount}</div>
                 <div class="room-label">Available</div>
             </div>
         </div>
@@ -106,7 +99,7 @@
             <div class="room-card-body">
                 <h3>Deluxe Room</h3>
                 <div class="room-rate">LKR 12,000/night</div>
-                <div class="room-available">${deluxeCount}</div>
+                <div class="room-available" id="count-deluxe">${deluxeCount}</div>
                 <div class="room-label">Available</div>
             </div>
         </div>
@@ -115,7 +108,7 @@
             <div class="room-card-body">
                 <h3>Suite Room</h3>
                 <div class="room-rate">LKR 20,000 - 25,000/night</div>
-                <div class="room-available">${suiteCount}</div>
+                <div class="room-available" id="count-suite">${suiteCount}</div>
                 <div class="room-label">Available</div>
             </div>
         </div>
@@ -135,10 +128,25 @@
         <a href="help.jsp" class="quick-action-btn">
             <span class="action-icon">?</span> Help Guide
         </a>
-
     </div>
 
-    <!-- Recent Reservations Table -->
+    <!-- Dashboard Charts — FIX: charts-grid class use කළා -->
+    <div class="charts-grid">
+        <div class="card">
+            <div class="card-header">Room Occupancy Overview</div>
+            <div style="text-align: center; padding: 20px;">
+                <canvas id="occupancyChart" width="300" height="300"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Room Availability by Type</div>
+            <div style="text-align: center; padding: 20px;">
+                <canvas id="roomTypeChart" width="300" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reservations -->
     <div class="card">
         <div class="card-header">Recent Reservations</div>
         <div class="table-container">
@@ -181,9 +189,9 @@
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <a href="reservation?action=view&id=${res.reservationId}" 
+                                        <a href="reservation?action=view&id=${res.reservationId}"
                                            class="btn btn-info btn-sm">View</a>
-                                        <a href="bill?action=generate&reservationId=${res.reservationId}" 
+                                        <a href="bill?action=generate&reservationId=${res.reservationId}"
                                            class="btn btn-warning btn-sm">Bill</a>
                                     </td>
                                 </tr>
@@ -191,7 +199,7 @@
                         </c:when>
                         <c:otherwise>
                             <tr>
-                                <td colspan="7" style="text-align: center; padding: 30px; color: #95a5a6;">
+                                <td colspan="7" style="text-align:center; padding:30px; color:#95a5a6;">
                                     No reservations found. Click "New Reservation" to create one.
                                 </td>
                             </tr>
@@ -204,40 +212,156 @@
 
 </div>
 
-<!-- Auto-refresh Dashboard Stats using AJAX -->
 <script>
-// Auto-refresh room availability every 30 seconds
-function refreshDashboardStats() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'api/dashboard?action=rooms', true);
+    // FIX: Parameters use 
+    function drawOccupancyChart(totalAvailable) {
+        var canvas = document.getElementById('occupancyChart');
+        var ctx = canvas.getContext('2d');
 
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            var data = JSON.parse(xhr.responseText);
+        var total = totalAvailable;
+        var totalRooms = 10;
+        var occupied = totalRooms - total;
+        var available = total;
+        var occupancyRate = totalRooms > 0 ? Math.round((occupied / totalRooms) * 100) : 0;
 
-            // Update room counts
-            var singleEl = document.querySelector('.room-card:nth-child(1) .room-available');
-            var doubleEl = document.querySelector('.room-card:nth-child(2) .room-available');
-            var deluxeEl = document.querySelector('.room-card:nth-child(3) .room-available');
-            var suiteEl = document.querySelector('.room-card:nth-child(4) .room-available');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (singleEl) singleEl.textContent = data.single;
-            if (doubleEl) doubleEl.textContent = data.double;
-            if (deluxeEl) deluxeEl.textContent = data.deluxe;
-            if (suiteEl) suiteEl.textContent = data.suite;
+        ctx.beginPath();
+        ctx.arc(150, 150, 100, 0, 2 * Math.PI);
+        ctx.fillStyle = '#eafaf1';
+        ctx.fill();
+        ctx.strokeStyle = '#27ae60';
+        ctx.lineWidth = 3;
+        ctx.stroke();
 
-            console.log('[AUTO-REFRESH] Dashboard stats updated');
+        if (occupied > 0) {
+            var occupiedAngle = (occupied / totalRooms) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.moveTo(150, 150);
+            ctx.arc(150, 150, 100, -Math.PI/2, -Math.PI/2 + occupiedAngle);
+            ctx.fillStyle = '#e74c3c';
+            ctx.fill();
         }
-    };
 
-    xhr.send();
-}
+        if (available > 0) {
+            var startAngle = occupied > 0
+                ? -Math.PI/2 + (occupied / totalRooms) * 2 * Math.PI
+                : -Math.PI/2;
+            var availableAngle = (available / totalRooms) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.moveTo(150, 150);
+            ctx.arc(150, 150, 100, startAngle, startAngle + availableAngle);
+            ctx.fillStyle = '#27ae60';
+            ctx.fill();
+        }
 
-// Refresh every 30 seconds
-setInterval(refreshDashboardStats, 30000);
+        ctx.beginPath();
+        ctx.arc(150, 150, 60, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
 
-// Show last refresh time
-console.log('[DASHBOARD] Auto-refresh enabled (30s interval)');
+        ctx.fillStyle = '#2c3e50';
+        ctx.font = 'bold 28px Segoe UI';
+        ctx.textAlign = 'center';
+        ctx.fillText(occupancyRate + '%', 150, 155);
+        ctx.font = '12px Segoe UI';
+        ctx.fillStyle = '#7f8c8d';
+        ctx.fillText('Occupancy', 150, 175);
+
+        ctx.font = '13px Segoe UI';
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#27ae60';
+        ctx.fillRect(60, 260, 15, 15);
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillText('Available: ' + available, 80, 273);
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(170, 260, 15, 15);
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillText('Occupied: ' + occupied, 190, 273);
+    }
+
+    // FIX: Parameters use කරනවා
+    function drawRoomTypeChart(single, doubleRoom, deluxe, suite) {
+        var canvas = document.getElementById('roomTypeChart');
+        var ctx = canvas.getContext('2d');
+
+        var data = [
+            {label: 'Single', value: single,    color: '#3498db'},
+            {label: 'Double', value: doubleRoom, color: '#2ecc71'},
+            {label: 'Deluxe', value: deluxe,     color: '#e67e22'},
+            {label: 'Suite',  value: suite,      color: '#9b59b6'}
+        ];
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        var barWidth  = 50;
+        var gap       = 20;
+        var startX    = 30;
+        var maxHeight = 200;
+        var baseY     = 240;
+
+        var maxVal = 0;
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].value > maxVal) maxVal = data[i].value;
+        }
+        if (maxVal === 0) maxVal = 1;
+
+        for (var i = 0; i < data.length; i++) {
+            var barHeight = (data[i].value / maxVal) * maxHeight;
+            var x = startX + i * (barWidth + gap);
+            var y = baseY - barHeight;
+
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(x + 3, y + 3, barWidth, barHeight);
+            ctx.fillStyle = data[i].color;
+            ctx.fillRect(x, y, barWidth, barHeight);
+
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 16px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText(data[i].value, x + barWidth/2, y - 8);
+
+            ctx.font = '12px Segoe UI';
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillText(data[i].label, x + barWidth/2, baseY + 18);
+        }
+
+        ctx.font = '13px Segoe UI';
+        ctx.fillStyle = '#7f8c8d';
+        ctx.textAlign = 'center';
+        ctx.fillText('Available Rooms by Type', 150, 285);
+    }
+
+    
+    var singleCount = parseInt('${singleCount}') || 0;
+    var doubleCount = parseInt('${doubleCount}') || 0;
+    var deluxeCount = parseInt('${deluxeCount}') || 0;
+    var suiteCount  = parseInt('${suiteCount}')  || 0;
+
+    drawOccupancyChart(singleCount + doubleCount + deluxeCount + suiteCount);
+    drawRoomTypeChart(singleCount, doubleCount, deluxeCount, suiteCount);
+
+   
+    function refreshDashboardStats() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'api/dashboard?action=rooms', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+
+                document.getElementById('count-single').textContent = data.single;
+                document.getElementById('count-double').textContent = data.double;
+                document.getElementById('count-deluxe').textContent = data.deluxe;
+                document.getElementById('count-suite').textContent  = data.suite;
+
+                var total = data.single + data.double + data.deluxe + data.suite;
+                drawOccupancyChart(total);
+                drawRoomTypeChart(data.single, data.double, data.deluxe, data.suite);
+            }
+        };
+        xhr.send();
+    }
+
+    setInterval(refreshDashboardStats, 30000);
 </script>
 
 </body>

@@ -22,118 +22,71 @@ public class Bill {
     private Timestamp billDate;
     private int generatedBy;
 
+    // ✅ Payment fields 
+    private String paymentStatus;   // PAID / UNPAID
+    private String paymentMethod;   // CASH / CARD
+    private Timestamp paidAt;
+
     // Default Constructor
-    public Bill() {
-    }
+    public Bill() {}
 
     // Getters and Setters
-    public int getBillId() {
-        return billId;
-    }
+    public int getBillId() { return billId; }
+    public void setBillId(int billId) { this.billId = billId; }
 
-    public void setBillId(int billId) {
-        this.billId = billId;
-    }
+    public int getReservationId() { return reservationId; }
+    public void setReservationId(int reservationId) { this.reservationId = reservationId; }
 
-    public int getReservationId() {
-        return reservationId;
-    }
+    public String getReservationNumber() { return reservationNumber; }
+    public void setReservationNumber(String reservationNumber) { this.reservationNumber = reservationNumber; }
 
-    public void setReservationId(int reservationId) {
-        this.reservationId = reservationId;
-    }
+    public String getGuestName() { return guestName; }
+    public void setGuestName(String guestName) { this.guestName = guestName; }
 
-    public String getReservationNumber() {
-        return reservationNumber;
-    }
+    public String getRoomType() { return roomType; }
+    public void setRoomType(String roomType) { this.roomType = roomType; }
 
-    public void setReservationNumber(String reservationNumber) {
-        this.reservationNumber = reservationNumber;
-    }
+    public String getRoomNumber() { return roomNumber; }
+    public void setRoomNumber(String roomNumber) { this.roomNumber = roomNumber; }
 
-    public String getGuestName() {
-        return guestName;
-    }
+    public String getCheckInDate() { return checkInDate; }
+    public void setCheckInDate(String checkInDate) { this.checkInDate = checkInDate; }
 
-    public void setGuestName(String guestName) {
-        this.guestName = guestName;
-    }
+    public String getCheckOutDate() { return checkOutDate; }
+    public void setCheckOutDate(String checkOutDate) { this.checkOutDate = checkOutDate; }
 
-    public String getRoomType() {
-        return roomType;
-    }
+    public int getNumberOfNights() { return numberOfNights; }
+    public void setNumberOfNights(int numberOfNights) { this.numberOfNights = numberOfNights; }
 
-    public void setRoomType(String roomType) {
-        this.roomType = roomType;
-    }
+    public double getRatePerNight() { return ratePerNight; }
+    public void setRatePerNight(double ratePerNight) { this.ratePerNight = ratePerNight; }
 
-    public String getRoomNumber() {
-        return roomNumber;
-    }
+    public double getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
 
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
+    public Timestamp getBillDate() { return billDate; }
+    public void setBillDate(Timestamp billDate) { this.billDate = billDate; }
 
-    public String getCheckInDate() {
-        return checkInDate;
-    }
+    public int getGeneratedBy() { return generatedBy; }
+    public void setGeneratedBy(int generatedBy) { this.generatedBy = generatedBy; }
 
-    public void setCheckInDate(String checkInDate) {
-        this.checkInDate = checkInDate;
-    }
+    // ✅ Payment getters/setters 
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
 
-    public String getCheckOutDate() {
-        return checkOutDate;
-    }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
-    public void setCheckOutDate(String checkOutDate) {
-        this.checkOutDate = checkOutDate;
-    }
-
-    public int getNumberOfNights() {
-        return numberOfNights;
-    }
-
-    public void setNumberOfNights(int numberOfNights) {
-        this.numberOfNights = numberOfNights;
-    }
-
-    public double getRatePerNight() {
-        return ratePerNight;
-    }
-
-    public void setRatePerNight(double ratePerNight) {
-        this.ratePerNight = ratePerNight;
-    }
-
-    public double getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public Timestamp getBillDate() {
-        return billDate;
-    }
-
-    public void setBillDate(Timestamp billDate) {
-        this.billDate = billDate;
-    }
-
-    public int getGeneratedBy() {
-        return generatedBy;
-    }
-
-    public void setGeneratedBy(int generatedBy) {
-        this.generatedBy = generatedBy;
-    }
+    public Timestamp getPaidAt() { return paidAt; }
+    public void setPaidAt(Timestamp paidAt) { this.paidAt = paidAt; }
 
     @Override
     public String toString() {
-        return "Bill [billId=" + billId + ", reservationNumber=" + reservationNumber
-                + ", guestName=" + guestName + ", totalAmount=" + totalAmount + "]";
+        return "Bill [billId=" + billId
+                + ", reservationNumber=" + reservationNumber
+                + ", guestName=" + guestName
+                + ", totalAmount=" + totalAmount
+                + ", paymentStatus=" + paymentStatus
+                + "]";
     }
 }

@@ -5,30 +5,24 @@ import com.oceanview.dao.RoomDAO;
 import com.oceanview.model.Room;
 import java.util.List;
 
-/**
- * RoomService - Business logic for Room operations
- * Part of the 3-Tier Architecture (Business Logic Layer)
- */
 public class RoomService {
 
-	protected RoomDAO roomDAO;
-	protected ValidationService validationService;
+    protected RoomDAO roomDAO;
+    protected ValidationService validationService;
 
     public RoomService() {
         this.roomDAO = DAOFactory.createRoomDAO();
         this.validationService = new ValidationService();
     }
 
-    /**
-     * Get all rooms
-     */
+    //Get all rooms
+     
     public List<Room> getAllRooms() {
         return roomDAO.getAllRooms();
     }
 
-    /**
-     * Get available rooms by type with validation
-     */
+    // Get available rooms by type with validation
+     
     public List<Room> getAvailableRoomsByType(String roomType) {
         if (!validationService.isValidRoomType(roomType)) {
             return null;
@@ -36,9 +30,18 @@ public class RoomService {
         return roomDAO.getAvailableRoomsByType(roomType);
     }
 
-    /**
-     * Get room by ID
-     */
+    //Get available rooms by type and date range with validation
+  
+    public List<Room> getAvailableRoomsByTypeAndDateRange(String roomType, String checkIn, String checkOut) {
+        if (!validationService.isValidRoomType(roomType)) return null;
+        if (!validationService.isValidDate(checkIn) || !validationService.isValidDate(checkOut)) return null;
+        if (!validationService.isValidCheckOutDate(checkIn, checkOut)) return null;
+
+        return roomDAO.getAvailableRoomsByTypeAndDateRange(roomType, checkIn, checkOut);
+    }
+
+    //Get room by ID
+    
     public Room getRoomById(int roomId) {
         if (roomId <= 0) {
             return null;
@@ -46,9 +49,8 @@ public class RoomService {
         return roomDAO.getRoomById(roomId);
     }
 
-    /**
-     * Get available room count by type using MySQL Function
-     */
+    //Get available room count by type using MySQL Function
+     
     public int getAvailableRoomCount(String roomType) {
         if (!validationService.isValidRoomType(roomType)) {
             return 0;
@@ -56,9 +58,8 @@ public class RoomService {
         return roomDAO.getAvailableRoomCount(roomType);
     }
 
-    /**
-     * Get all room types
-     */
+    //Get all room types
+     
     public List<String> getRoomTypes() {
         return roomDAO.getRoomTypes();
     }

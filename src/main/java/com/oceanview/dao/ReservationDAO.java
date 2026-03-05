@@ -53,6 +53,32 @@ public class ReservationDAO {
         }
     }
 
+    /**
+     * Backend overlap check — double booking prevent කරනවා
+     * UI filter කළත් backend guarantee එකත් තියෙනවා
+     */
+    public boolean hasOverlappingReservation(int roomId, String checkIn, String checkOut) {
+        String sql = "SELECT COUNT(*) as count FROM reservations " +
+                     "WHERE room_id = ? " +
+                     "AND status = 'Confirmed' " +
+                     "AND check_in_date < ? " +
+                     "AND check_out_date > ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, roomId);
+            stmt.setString(2, checkOut);
+            stmt.setString(3, checkIn);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking overlapping reservation: " + e.getMessage());
+        }
+        return false;
+    }
+
     public Reservation getReservationByNumber(String reservationNumber) {
         Reservation reservation = null;
         try (Connection conn = dbConnection.getConnection();

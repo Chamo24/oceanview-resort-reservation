@@ -10,10 +10,12 @@
 </head>
 <body>
 
-<!-- Navigation Bar -->
 <nav class="navbar no-print">
     <div class="navbar-content">
-        <div class="navbar-brand"><img src="images/logo.png" style="width:80px; height:auto; vertical-align:middle; margin-right:12px;">Ocean View <span>Resort</span></div>
+        <div class="navbar-brand">
+            <img src="images/logo.png" style="width:80px; height:auto; vertical-align:middle; margin-right:12px;">
+            Ocean View <span>Resort</span>
+        </div>
         <ul class="navbar-menu">
             <li><a href="dashboard">Dashboard</a></li>
             <li><a href="reservation?action=add">New Reservation</a></li>
@@ -27,7 +29,6 @@
     </div>
 </nav>
 
-<!-- Main Content -->
 <div class="main-content">
 
     <div class="page-header no-print">
@@ -35,7 +36,6 @@
         <p>Generated bill for reservation</p>
     </div>
 
-    <!-- Messages -->
     <c:if test="${not empty success}">
         <div class="alert alert-success no-print">${success}</div>
     </c:if>
@@ -44,10 +44,13 @@
     </c:if>
 
     <c:if test="${not empty bill}">
-        <!-- Bill Card -->
+
+        <!-- Default payment status if NULL -->
+        <c:set var="payStatus" value="${empty bill.paymentStatus ? 'UNPAID' : bill.paymentStatus}" />
+
         <div class="bill-container">
-            <!-- Bill Header -->
-                        <div class="bill-header bill-header-styled">
+
+            <div class="bill-header bill-header-styled">
                 <img src="images/logo.png" alt="Ocean View Resort" class="hotel-logo" style="border-color: #ffffff;">
                 <h2>Ocean View Resort</h2>
                 <p>No. 42, Lighthouse Street, Galle Fort, Galle, Sri Lanka</p>
@@ -56,8 +59,8 @@
                 <h3 style="font-size: 18px;">GUEST BILL / INVOICE</h3>
             </div>
 
-            <!-- Bill Body -->
             <div class="bill-body">
+
                 <div class="bill-row">
                     <span class="bill-label">Bill Number</span>
                     <span class="bill-value">#BILL-${bill.billId}</span>
@@ -105,14 +108,28 @@
                     <span class="bill-value">LKR ${bill.ratePerNight}</span>
                 </div>
 
-                <!-- Total -->
+                <!-- Payment Status -->
+                <div class="bill-row">
+                    <span class="bill-label">Payment Status</span>
+                    <span class="bill-value">
+                        <c:choose>
+                            <c:when test="${payStatus == 'PAID'}">
+                                <span class="badge badge-confirmed">PAID</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="badge badge-cancelled">UNPAID</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </span>
+                </div>
+
                 <div class="bill-total">
                     <span class="total-label">TOTAL AMOUNT</span>
                     <span class="total-value">LKR ${bill.totalAmount}</span>
                 </div>
+
             </div>
 
-            <!-- Bill Footer -->
             <div class="bill-footer">
                 <p><strong>Thank you for choosing Ocean View Resort!</strong></p>
                 <p>We hope you enjoyed your stay in beautiful Galle, Sri Lanka.</p>
@@ -120,12 +137,48 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- Record Payment (UNPAID only) -->
+        <c:if test="${payStatus != 'PAID'}">
+            <div class="card no-print" style="max-width:700px; margin:15px auto;">
+                <div class="card-header">Record Payment</div>
+
+                <form action="${pageContext.request.contextPath}/bill" method="post">
+                    <input type="hidden" name="action" value="pay" />
+                    <input type="hidden" name="billId" value="${bill.billId}" />
+                    <input type="hidden" name="reservationId" value="${bill.reservationId}" />
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Payment Method *</label>
+                            <select name="paymentMethod" required>
+                                <option value="">-- Select --</option>
+                                <option value="CASH">Cash</option>
+                                <option value="CARD">Card</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success" style="width:auto;">Confirm Payment</button>
+                </form>
+            </div>
+        </c:if>
+
+        <!-- Paid Info -->
+        <c:if test="${payStatus == 'PAID'}">
+            <div class="alert alert-success no-print" style="max-width:700px; margin:15px auto;">
+                Paid by <strong><c:out value="${bill.paymentMethod}" default="-" /></strong>
+                <c:if test="${not empty bill.paidAt}">
+                    on <strong>${bill.paidAt}</strong>
+                </c:if>
+            </div>
+        </c:if>
+
         <div style="text-align: center; margin-top: 25px;" class="no-print">
             <button onclick="window.print()" class="btn btn-primary">🖨️ Print Bill</button>
             <a href="bill?action=list" class="btn btn-info" style="margin-left: 10px;">All Bills</a>
             <a href="dashboard" class="btn btn-success" style="margin-left: 10px;">Dashboard</a>
         </div>
+
     </c:if>
 
     <c:if test="${empty bill}">

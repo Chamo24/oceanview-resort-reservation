@@ -28,14 +28,14 @@ function validateCheckInDate(checkInDate) {
 
 function validateCheckOutDate(checkInDate, checkOutDate) {
     if (!checkInDate || !checkOutDate) return false;
-    var checkIn = new Date(checkInDate);
+    var checkIn  = new Date(checkInDate);
     var checkOut = new Date(checkOutDate);
     return checkOut > checkIn;
 }
 
 function calculateNights(checkInDate, checkOutDate) {
     if (!checkInDate || !checkOutDate) return 0;
-    var checkIn = new Date(checkInDate);
+    var checkIn  = new Date(checkInDate);
     var checkOut = new Date(checkOutDate);
     var diffTime = checkOut - checkIn;
     var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -114,12 +114,19 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 hideError('checkInError');
                 this.style.borderColor = '#27ae60';
+
                 var checkOutInput = document.getElementById('checkOutDate');
                 if (checkOutInput) {
                     checkOutInput.setAttribute('min', this.value);
                 }
+
                 if (typeof updateCostEstimate === 'function') {
                     updateCostEstimate();
+                }
+
+               
+                if (typeof loadAvailableRooms === 'function') {
+                    loadAvailableRooms();
                 }
             }
         });
@@ -136,8 +143,14 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 hideError('checkOutError');
                 this.style.borderColor = '#27ae60';
+
                 if (typeof updateCostEstimate === 'function') {
                     updateCostEstimate();
+                }
+
+                
+                if (typeof loadAvailableRooms === 'function') {
+                    loadAvailableRooms();
                 }
             }
         });
@@ -174,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
 
-            var checkIn = document.getElementById('checkInDate').value;
+            var checkIn  = document.getElementById('checkInDate').value;
             var checkOut = document.getElementById('checkOutDate').value;
             if (!validateCheckInDate(checkIn)) {
                 showError('checkInError', 'Invalid check-in date.');

@@ -8,10 +8,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * RoomDAO - Data Access Object for Room operations
- * Handles all database operations related to rooms table
- */
 public class RoomDAO {
 
     private DBConnection dbConnection;
@@ -62,6 +58,44 @@ public class RoomDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error getting available rooms: " + e.getMessage());
+        }
+
+        return rooms;
+    }
+
+    /**
+     * Get available rooms by type and date range
+     * Date overlap check — rooms.status use නොකරයි
+     */
+    public List<Room> getAvailableRoomsByTypeAndDateRange(String roomType, String checkIn, String checkOut) {
+        String sql =
+            "SELECT rm.* FROM rooms rm " +
+            "WHERE rm.room_type = ? " +
+            "AND NOT EXISTS ( " +
+            "   SELECT 1 FROM reservations r " +
+            "   WHERE r.room_id = rm.room_id " +
+            "     AND r.status = 'Confirmed' " +
+            "     AND r.check_in_date < ? " +
+            "     AND r.check_out_date > ? " +
+            ") " +
+            "ORDER BY rm.room_number";
+
+        List<Room> rooms = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, roomType);
+            stmt.setString(2, checkOut);
+            stmt.setString(3, checkIn);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    rooms.add(extractRoomFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting available rooms by type and date range: " + e.getMessage());
         }
 
         return rooms;
@@ -149,9 +183,9 @@ public class RoomDAO {
         room.setDescription(rs.getString("description"));
         return room;
     }
+
     /**
      * Get room occupancy summary for reports
-     * Returns count of rooms by status for each type
      */
     public List<Room> getRoomOccupancyReport() {
         String sql = "SELECT room_type, status, COUNT(*) as room_count, " +

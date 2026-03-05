@@ -15,12 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * RoomApiServlet - REST API Web Service for Room data
- * URL: /api/rooms
- * Returns JSON data for AJAX requests from frontend
- * This makes the application a Distributed Application with Web Services
- */
 @WebServlet("/api/rooms")
 public class RoomApiServlet extends HttpServlet {
 
@@ -36,9 +30,10 @@ public class RoomApiServlet extends HttpServlet {
 
     /**
      * GET - Returns room data as JSON
-     * /api/rooms - Get all rooms
-     * /api/rooms?type=Single - Get available rooms by type
-     * /api/rooms?action=count - Get available room counts
+     * /api/rooms                                      - Get all rooms
+     * /api/rooms?type=Single                          - Get available rooms by type
+     * /api/rooms?type=Single&checkIn=...&checkOut=... - Get available rooms by date range
+     * /api/rooms?action=count                         - Get available room counts
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -48,8 +43,12 @@ public class RoomApiServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         PrintWriter out = response.getWriter();
+
         String roomType = request.getParameter("type");
-        String action = request.getParameter("action");
+        String action   = request.getParameter("action");
+        // Step 3 — date parameters කියවනවා
+        String checkIn  = request.getParameter("checkIn");
+        String checkOut = request.getParameter("checkOut");
 
         try {
             if ("count".equals(action)) {
@@ -58,14 +57,25 @@ public class RoomApiServlet extends HttpServlet {
                 counts.put("Single", roomService.getAvailableRoomCount("Single"));
                 counts.put("Double", roomService.getAvailableRoomCount("Double"));
                 counts.put("Deluxe", roomService.getAvailableRoomCount("Deluxe"));
-                counts.put("Suite", roomService.getAvailableRoomCount("Suite"));
+                counts.put("Suite",  roomService.getAvailableRoomCount("Suite"));
 
                 out.print(gson.toJson(counts));
 
             } else if (roomType != null && !roomType.isEmpty()) {
-                // Return available rooms for specific type
-                List<Room> rooms = roomService.getAvailableRoomsByType(roomType);
-                out.print(gson.toJson(rooms));
+
+                // dates pass කළොත් — new date range method call කරනවා
+                if (checkIn != null && checkOut != null
+                        && !checkIn.isEmpty() && !checkOut.isEmpty()) {
+
+                    List<Room> rooms = roomService.getAvailableRoomsByTypeAndDateRange(
+                            roomType, checkIn, checkOut);
+                    out.print(gson.toJson(rooms));
+
+                } else {
+                    // dates නැත්නම් — old method (fallback)
+                    List<Room> rooms = roomService.getAvailableRoomsByType(roomType);
+                    out.print(gson.toJson(rooms));
+                }
 
             } else {
                 // Return all rooms

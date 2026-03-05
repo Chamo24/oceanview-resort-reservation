@@ -1,6 +1,7 @@
 package com.oceanview.dao;
 
 import com.oceanview.model.Bill;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -116,6 +117,28 @@ public class BillDAO {
     }
 
     /**
+     * Mark a bill as PAID (records payment method and timestamp)
+     */
+    public boolean markBillAsPaid(int billId, String method) {
+        String sql = "UPDATE bills " +
+                     "SET payment_status = 'PAID', payment_method = ?, paid_at = NOW() " +
+                     "WHERE bill_id = ? AND payment_status <> 'PAID'";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, method);
+            stmt.setInt(2, billId);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error marking bill as paid: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Helper method to extract Bill from ResultSet
      */
     private Bill extractBillFromResultSet(ResultSet rs) throws SQLException {
@@ -133,8 +156,15 @@ public class BillDAO {
         bill.setTotalAmount(rs.getDouble("total_amount"));
         bill.setBillDate(rs.getTimestamp("bill_date"));
         bill.setGeneratedBy(rs.getInt("generated_by"));
+
+        // ✅ Payment fields
+        bill.setPaymentStatus(rs.getString("payment_status"));
+        bill.setPaymentMethod(rs.getString("payment_method"));
+        bill.setPaidAt(rs.getTimestamp("paid_at"));
+
         return bill;
     }
+
     /**
      * Get total revenue from all bills
      */
@@ -173,6 +203,7 @@ public class BillDAO {
             while (rs.next()) {
                 Bill bill = new Bill();
                 bill.setRoomType(rs.getString("room_type"));
+                // NOTE: you used generatedBy field to store bill_count in report view
                 bill.setGeneratedBy(rs.getInt("bill_count"));
                 bill.setNumberOfNights(rs.getInt("total_nights"));
                 bill.setTotalAmount(rs.getDouble("total_revenue"));
