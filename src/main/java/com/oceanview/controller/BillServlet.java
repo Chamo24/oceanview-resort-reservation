@@ -137,7 +137,7 @@ public class BillServlet extends HttpServlet {
     private void viewBill(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ✅ show session messages (after redirect from pay)
+        // show session messages (after redirect from pay)
         HttpSession session = request.getSession(false);
         if (session != null) {
             String success = (String) session.getAttribute("success");

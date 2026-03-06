@@ -53,10 +53,7 @@ public class ReservationDAO {
         }
     }
 
-    /**
-     * Backend overlap check — double booking prevent කරනවා
-     * UI filter කළත් backend guarantee එකත් තියෙනවා
-     */
+    
     public boolean hasOverlappingReservation(int roomId, String checkIn, String checkOut) {
         String sql = "SELECT COUNT(*) as count FROM reservations " +
                      "WHERE room_id = ? " +

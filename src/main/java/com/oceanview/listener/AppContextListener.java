@@ -8,17 +8,7 @@ import javax.servlet.annotation.WebListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-/**
- * AppContextListener - Application lifecycle listener
- * Initializes resources when application starts
- * Cleans up resources when application stops
- * 
- * This listener follows the Observer design pattern.
- * It observes the application lifecycle events and reacts accordingly.
- * 
- * On startup: Initializes database connection (Singleton)
- * On shutdown: Logs cleanup message
- */
+/** Observer pattern listener that initializes Singleton DB on startup and logs cleanup on shutdown. */
 @WebListener
 public class AppContextListener implements ServletContextListener {
 

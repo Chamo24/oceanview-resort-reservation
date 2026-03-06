@@ -17,7 +17,7 @@ function loadAvailableRooms() {
         return;
     }
 
-    // Step 4 — checkIn/checkOut dates 
+    // checkIn/checkOut dates 
     var checkInDate  = document.getElementById('checkInDate').value;
     var checkOutDate = document.getElementById('checkOutDate').value;
 
